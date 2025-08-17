@@ -1,0 +1,121 @@
+<html>
+    <body>
+        <%- include('../../partical/admin/header'); %>
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h3 style="text-align: center;" class="mb-4">ADD ROOM</h3>
+                <b>NOTE FORMAT:</b>
+                <p>Room numbers: For example like: 1, 2, 3</p>
+                <p>Unavailble dates: yyyy-mm-dd + yyyy-mm-dd, yyyy-mm-dd, yyyy-mm-dd</p>
+                <div class="form-floating mb-3">
+                    <input name="name" class="form-control" id="floatingInput"
+                        placeholder="name">
+                    <label for="floatingInput">name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="price" class="form-control" id="floatingInput"
+                        placeholder="price">
+                    <label for="floatingInput">price</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="desc" class="form-control" id="floatingInput"
+                        placeholder="description">
+                    <label for="floatingInput">description</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="numbers" class="form-control" id="floatingInput"
+                        placeholder="for example like: 1,2,3">
+                    <label for="floatingInput">room numbers</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="unavailbleDates" class="form-control" id="floatingInput"
+                        placeholder="yyyy-mm-dd, yyyy-mm-dd,...">
+                    <label for="floatingInput">unavailble dates</label>
+                </div>
+                <br>
+                <button id="add" type="button" class="btn btn-dark m-2">ADD ROOM</button>
+            </div>
+        </div>
+        <%- include('../../partical/admin/footer'); %>
+
+    <script>
+
+        loadData();
+        function loadData() {
+          handleAddButtonClick();
+        }
+
+        async function createRoom(data, callback) {
+
+            const apiCreateRoom = "/room/insert-room";
+            var options = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+            };
+
+            await fetch(apiCreateRoom, options)
+            .then(function (response) {
+                response.json();
+            })
+            .then(callback);
+            
+
+        };
+
+
+        function handleAddButtonClick() {
+
+            let addBtn = document.querySelector('#add');
+
+            addBtn.onclick = function () {
+
+            var name = document.querySelector('input[name="name"]').value;
+            var price = document.querySelector('input[name="price"]').value;
+            var desc = document.querySelector('input[name="desc"]').value;
+            var numbers = document.querySelector('input[name="numbers"]').value;
+            var unavailbleDates = document.querySelector('input[name="unavailbleDates"]').value;
+            
+            numbers = new String(numbers).split(",");
+            unavailbleDates = new String(unavailbleDates).split(",");
+            console.log(numbers);
+            console.log(unavailbleDates);    
+            var list = [];
+            for(var i = 0; i< numbers.length; i++){
+                
+                    var temp = new String(unavailbleDates[i]).split("+");
+                    console.log(temp);
+                    var roomNumber = {
+                        number:numbers[i],
+                        unavailbleDates: temp
+                    };
+                    console.log(roomNumber);
+                    list.push(roomNumber);
+                
+                console.log(list);
+            }
+            
+            var formData = {
+                name: name,
+                price: price,
+                desc: desc,
+                roomNumbers: list
+            };
+            console.log(formData);
+            createRoom(formData, function () {
+                loadData();
+                console.log("da them phong");
+            });
+
+            };
+        };
+    </script>
+
+
+
+        
+    </body>
+</html>
+

@@ -1,0 +1,78 @@
+
+<html>
+<body>
+    <%- include('../../partical/admin/header'); %>
+    <!-- Table Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">MANAGE USER</h6>
+                    <div class="table-responsive">
+                        <table id="userTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">username</th>
+                                    <th scope="col">email</th>
+                                    <th scope="col">phone</th>
+                                    <th scope="col">password</th>
+                                    <th scope="col">isAdmin</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="mainUser">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Table End -->
+    
+    <%- include('../../partical/admin/footer'); %>
+    
+    
+<script>
+
+    loadData();
+    async function loadData(){
+        await loadUser();
+        let table = new DataTable('#userTable');
+    };
+
+    async function loadUser() {
+      
+        var mainUser = document.getElementById("mainUser");
+        const response = await  fetch("/authenticate/get-user-list");
+        var temp="";
+        var data = await response.json();
+        mainUser.innerHTML = ``;
+
+              for(var i = 0; i< data.length; i++){
+
+                    temp += `<tr>
+                            <th scope="row">${i+1}</th>
+                            <td>${data[i].username}</td>
+                            <td>${data[i].email}</td>
+                            <td>${data[i].phone}</td>
+                            <td>${data[i].password}</td>
+                            <td>${data[i].isAdmin}</td>
+                            </tr>`
+                            
+                };
+
+        mainUser.innerHTML = temp;
+    };
+
+
+
+</script>
+
+
+</body>
+</html>
+
+

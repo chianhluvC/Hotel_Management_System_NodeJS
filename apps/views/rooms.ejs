@@ -1,0 +1,144 @@
+<html lang="zxx">
+
+<body>
+    
+    <%- include('partical/header'); %>
+
+    <!-- Breadcrumb Section Begin -->
+    <div class="breadcrumb-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb-text">
+                        <h2>Our Rooms</h2>
+                        <div class="bt-option">
+                            <a href="/">Home</a>
+                            <span>Rooms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Rooms Section Begin -->
+    <section class="rooms-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="row" id="listCardRoom">
+                </div>
+                
+                <div class="col-lg-12">
+                    <div id="numberPage" class="room-pagination">
+                        <a href="#"><i class="fa fa-long-arrow-left"> Pre</i></a>
+                        <a href="#">1</a>
+                        <a href="#">Next <i class="fa fa-long-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Rooms Section End -->
+
+    <%- include('partical/footer'); %>
+
+
+    <script>
+
+        loadData();
+
+        function loadData(){
+            handlePagination();
+        };
+
+
+
+
+        async function handlePagination(p) {
+                var page = parseInt(p) || 0;
+                var number = page + 1;
+                var limit = 3;
+                var temp = "";
+                var tempn = "";
+                const response = await fetch("/room/pagination?pageNumber=" + page + "&limit=" + limit);
+                var result = await response.json();
+                var listRoom = result.data.data;
+                console.log(result);
+                var listNumber = document.getElementById("numberPage");
+                var data = result.data;
+                var totalPage = data.totalRoom / limit;
+                if (!Number.isInteger(data.totalRoom / limit)) {
+                    totalPage = parseInt(data.totalRoom / limit) + 1;
+                }
+                console.log(totalPage);
+                var listCardRoom = document.getElementById("listCardRoom");
+
+                for (var i = 0; i < listRoom.length; i++) {
+
+                    temp += `<div class="col-lg-4 col-md-6">
+                                <div class="room-item">
+                                    <img src="/static/img/room/room-1.jpg" alt="">
+                                    <div class="ri-text">
+                                        <h4>${listRoom[i].name}</h4>
+                                        <h3>${listRoom[i].price}$<span>/Pernight</span></h3>
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="r-o">Size:</td>
+                                                    <td>30 ft</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="r-o">Capacity:</td>
+                                                    <td>Max persion 3</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="r-o">Bed:</td>
+                                                    <td>King Beds</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="r-o">Services:</td>
+                                                    <td>Wifi, Television, Bathroom,...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <a href="/room-details/${listRoom[i]._id}" class="primary-btn">More Details</a>
+                                    </div>
+                                </div>
+                            </div>`;
+
+                }
+                for (var i = 0; i < totalPage; i++) {
+                    tempn += ` 
+                            <a id="${i + 1}" onclick="handlePagination('${i}')" href="#">${i + 1}</a>
+                        
+                            `
+                }
+                var pre = "";
+                var next = "";
+                if (data.previous != null) {
+                    pre = `<a id="${data.previous}" onclick="handlePagination('${data.previous.pageNumber}')" href="#"> <i class="fa fa-long-arrow-left"></i> Pre</a>`;
+                }
+                if (data.next != null) {
+                    next = `<a id="${data.next}" onclick="handlePagination('${data.next.pageNumber}')" href="#">Next <i class="fa fa-long-arrow-right"></i></a>`;
+                }
+                listNumber.innerHTML = pre + tempn + next;
+                listCardRoom.innerHTML = temp;
+                var pageActive = document.getElementById(number);
+                console.log(number);
+                pageActive.className = "active";
+        };
+
+
+
+    </script>
+
+
+    
+
+
+
+   
+</body>
+
+</html>

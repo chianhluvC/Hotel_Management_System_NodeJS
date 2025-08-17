@@ -1,0 +1,189 @@
+<html>
+    <body>
+        <%- include('../../partical/admin/header'); %>
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <h3 style="text-align: center;" class="mb-4">EDIT ROOM</h3>
+                <b>NOTE FORMAT:</b>
+                <p>Room numbers: For example like: 1, 2, 3</p>
+                <p>Unavailble dates: yyyy-mm-dd + yyyy-mm-dd, yyyy-mm-dd, yyyy-mm-dd</p>
+                <div class="form-floating mb-3">
+                    <input name="name" class="form-control" 
+                        placeholder="name">
+                    <label for="floatingInput">name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="price" class="form-control" 
+                        placeholder="price">
+                    <label for="floatingInput">price</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="desc" class="form-control" 
+                        placeholder="description">
+                    <label for="floatingInput">description</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="numbers" class="form-control" 
+                        placeholder="for example like: 1,2,3">
+                    <label for="floatingInput">room numbers</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input name="unavailbleDates" class="form-control" 
+                        placeholder="yyyy-mm-dd, yyyy-mm-dd,...">
+                    <label for="floatingInput">unavailble dates</label>
+                </div>
+                <br>
+                <button id="edit" type="button" class="btn btn-dark m-2">EDIT ROOM</button>
+            </div>
+        </div>
+        <%- include('../../partical/admin/footer'); %>
+
+    <script>
+
+        loadData();
+        async function loadData() {
+          await loadForm();
+          handleEditButtonClick();
+        }
+
+        
+
+        async function loadForm(){
+
+            const idRoom = await getIdRoomFromURL();
+            var room = await getRoombyId(idRoom);
+            var tempDate;
+            var temp = "";
+            var num = "";
+            var date = "";
+            console.log(idRoom);
+            document.querySelector('input[name="name"]').value = room.name;
+            document.querySelector('input[name="price"]').value = room.price;
+            document.querySelector('input[name="desc"]').value = room.desc;
+            for(var i = 0; i< room.roomNumbers.length; i++){
+                        var arr = Object.values(room.roomNumbers[i].unavailbleDates);
+                        console.log(arr);
+                        tempDate = "";
+                        tempDate += (arr.map(p=>new Date(p).toLocaleDateString('en-CA')));
+                        console.log(tempDate);
+                        tempResult = tempDate.replaceAll(",","+");
+                        console.log(tempResult);
+                        temp += room.roomNumbers[i].number;
+                        date += tempResult;
+                        if(i<room.roomNumbers.length-1){
+                            date = date + ",";
+                            temp = temp + ",";
+                        }
+                    };
+            console.log(date);
+            console.log(temp);
+            document.querySelector('input[name="numbers"]').value = temp;
+            document.querySelector('input[name="unavailbleDates"]').value = date;
+
+        };
+
+        function getIdRoomFromURL(){
+            const link = window.location.pathname;
+            var arr = [];
+            arr = link.toString().split("/");
+            const  idRoom = arr[arr.length-1];
+            return idRoom;
+        };
+
+        async function getRoombyId(idRoom){
+
+            const response = await  fetch("/room/get-room?_id="+idRoom);
+            var room = await response.json();
+            console.log(room);
+            return room;
+        };
+
+
+
+        async function editRoom(data, callback) {
+            const id = getIdRoomFromURL();
+            const apiEditRoom = "/room/update-room?_id="+id;
+            var options = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+            };
+
+            await fetch(apiEditRoom, options)
+            .then(function (response) {
+                response.json();
+            })
+            .then(callback);
+
+
+        };
+
+
+        function handleEditButtonClick() {
+
+            let addBtn = document.querySelector('#edit');
+
+            addBtn.onclick = function () {
+                var name = document.querySelector('input[name="name"]').value;
+                var price = document.querySelector('input[name="price"]').value;
+                var desc = document.querySelector('input[name="desc"]').value;
+                var numbers = document.querySelector('input[name="numbers"]').value;
+                var unavailbleDates = document.querySelector('input[name="unavailbleDates"]').value;
+                const id = getIdRoomFromURL();
+                
+                numbers = new String(numbers).split(",");
+                unavailbleDates = new String(unavailbleDates).split(",");
+                console.log(numbers);
+                console.log(unavailbleDates);    
+                var list = [];
+                for(var i = 0; i< numbers.length; i++){
+                    
+                        var temp = new String(unavailbleDates[i]).split("+");
+                        console.log(temp);
+                        var roomNumber = {
+                            number:numbers[i],
+                            unavailbleDates: temp
+                        };
+                        console.log(roomNumber);
+                        list.push(roomNumber);
+                    
+                    console.log(list);
+                };
+                
+                var formData = {
+                    _id: id, 
+                    name: name,
+                    price: price,
+                    desc: desc,
+                    roomNumbers: list
+                };
+                console.log(formData);
+                editRoom(formData, function () {
+                    loadData();
+                    showMessageBox();
+                });
+
+            };
+        };
+
+        function showMessageBox() {
+            var txt;
+            if (confirm("Go back manage Room?")) {
+                txt = "You pressed OK!";
+                location.replace("/admin/room-list");
+            } else {
+                txt = "You pressed Cancel!";
+            };
+            
+        };
+
+    </script>
+
+
+
+        
+    </body>
+</html>
+

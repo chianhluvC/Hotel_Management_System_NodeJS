@@ -1,0 +1,302 @@
+<html lang="zxx">
+  <body>
+    <%- include('partical/header'); %>
+    <!-- Breadcrumb Section Begin -->
+    <div class="breadcrumb-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="breadcrumb-text">
+              <h2>Room Details</h2>
+              <div class="bt-option">
+                <a href="/">Home</a>
+                <a href="/rooms">Rooms</a>
+                <span>Details</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Room Details Section Begin -->
+    <section class="room-details-section spad">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="room-details-item">
+              <img src="/static/img/room/room-details.jpg" alt="" />
+              <div class="rd-text">
+                <div class="rd-title">
+                  <h3 id="roomName"></h3>
+                  <div class="rdt-right">
+                    <div class="rating">
+                      <i class="icon_star"></i>
+                      <i class="icon_star"></i>
+                      <i class="icon_star"></i>
+                      <i class="icon_star"></i>
+                      <i class="icon_star-half_alt"></i>
+                    </div>
+                    <a id="btnCreate" href="#">Booking Now</a>
+                  </div>
+                </div>
+                <h2 id="roomPrice"><span>/Pernight</span></h2>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="r-o">Size:</td>
+                      <td>30 ft</td>
+                    </tr>
+                    <tr>
+                      <td class="r-o">Capacity:</td>
+                      <td>Max persion 5</td>
+                    </tr>
+                    <tr>
+                      <td class="r-o">Bed:</td>
+                      <td>King Beds</td>
+                    </tr>
+                    <tr>
+                      <td class="r-o">Services:</td>
+                      <td>Wifi, Television, Bathroom,...</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p class="f-para">
+                  Motorhome or Trailer that is the question for you. Here are
+                  some of the advantages and disadvantages of both, so you will
+                  be confident when purchasing an RV. When comparing Rvs, a
+                  motorhome or a travel trailer, should you buy a motorhome or
+                  fifth wheeler? The advantages and disadvantages of both are
+                  studied so that you can make your choice wisely when
+                  purchasing an RV. Possessing a motorhome or fifth wheel is an
+                  achievement of a lifetime. It can be similar to sojourning
+                  with your residence as you search the various sites of our
+                  great land, America.
+                </p>
+                <p>
+                  The two commonly known recreational vehicle classes are the
+                  motorized and towable. Towable rvs are the travel trailers and
+                  the fifth wheel. The rv travel trailer or fifth wheel has the
+                  attraction of getting towed by a pickup or a car, thus giving
+                  the adaptability of possessing transportation for you when you
+                  are parked at your campsite.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="room-booking">
+              <h3>Your Reservation</h3>
+              <form>
+                <div class="check-date">
+                  <label for="date-in">Name:</label>
+                  <input name="name" type="text" />
+                </div>
+                <div class="check-date">
+                  <label for="date-in">Email:</label>
+                  <input name="email" type="text" />
+                </div>
+                <div class="check-date">
+                  <label for="date-in">Check In:</label>
+                  <input
+                    name="checkIn"
+                    type="text"
+                    class="date-input"
+                    id="date-in"
+                  />
+                  <i class="icon_calendar"></i>
+                </div>
+                <div class="check-date">
+                  <label for="date-out">Check Out:</label>
+                  <input
+                    name="checkOut"
+                    type="text"
+                    class="date-input"
+                    id="date-out"
+                  />
+                  <i class="icon_calendar"></i>
+                </div>
+
+                <div>
+                  <p>Room Number:</p>
+                  <div id="roomNumber"></div>
+                </div>
+                <br />
+                <button id="btnAvail" type="button">Check Availability</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Room Details Section End -->
+
+    <%- include('partical/footer'); %>
+
+    <script>
+      loadData();
+      async function loadData() {
+        await loadDetail();
+        await handleRoomNumber(await getIdRoomFromURL());
+        await handleAvailability();
+        await handleCreateBooking();
+      }
+
+      async function loadDetail() {
+        const idRoom = await getIdRoomFromURL();
+        var room = await getRoombyId(idRoom);
+        var roomName = document.getElementById("roomName");
+        var roomPrice = document.getElementById("roomPrice");
+        roomName.innerHTML = room.name;
+        roomPrice.innerHTML = room.price + "$";
+      }
+
+      function getIdRoomFromURL() {
+        const link = window.location.pathname;
+        var arr = [];
+        arr = link.toString().split("/");
+        console.log(arr.length);
+        const idRoom = arr[arr.length - 1];
+        return idRoom;
+      }
+
+      async function getRoombyId(idRoom) {
+        const response = await fetch("/room/get-room?_id=" + idRoom);
+        var room = await response.json();
+        console.log(room);
+        return room;
+      }
+
+      async function handleRoomNumber(idRoom) {
+        var room = await getRoombyId(idRoom);
+        var roomNumber = document.getElementById("roomNumber");
+        var temp = ``;
+        roomNumber.innerHTML = ``;
+        for (i = 0; i < room.roomNumbers.length; i++) {
+          console.log(room.roomNumbers[i].number);
+          temp += `<div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox${
+                              i + 1
+                            }" value="${room.roomNumbers[i].number}">
+                            <label class="form-check-label" for="inlineCheckbox${
+                              i + 1
+                            }">${room.roomNumbers[i].number}</label>
+                        </div>`;
+        }
+
+        roomNumber.innerHTML = temp;
+      }
+
+      async function handleAvailability() {
+        let btnAvail = document.getElementById("btnAvail");
+
+        btnAvail.onclick = async function () {
+          var checkedValue = [];
+          var inputElements =
+            document.getElementsByClassName("form-check-input");
+          for (var i = 0; inputElements[i]; ++i) {
+            if (inputElements[i].checked) {
+              checkedValue.push(inputElements[i].value);
+            }
+          }
+          var checkOut = document.querySelector('input[name="checkOut"]').value;
+          var checkIn = document.querySelector('input[name="checkIn"]').value;
+          var email = document.querySelector('input[name="email"]').value;
+          var name = document.querySelector('input[name="name"]').value;
+          console.log(checkedValue);
+          console.log(new Date(checkIn).toLocaleDateString("en-CA"));
+          console.log(checkOut);
+
+          var formData = {
+            roomId: getIdRoomFromURL(),
+            checkOutDate: new Date(checkOut).toLocaleDateString("en-CA"),
+            checkInDate: new Date(checkIn).toLocaleDateString("en-CA"),
+            number: checkedValue,
+            name: name,
+            email: email,
+          };
+
+          await checkAvailability(formData);
+        };
+      }
+
+      async function checkAvailability(data) {
+        const apiCheckavail = "/booking/check-availability";
+        var options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        };
+
+        await fetch(apiCheckavail, options).then(async function (response) {
+          if (await response.ok) {
+            await response.json();
+            alert("Information true, you can booking now!");
+          } else alert("Unfortunately, all rooms are fully booked for your selected dates. Would you like to choose a different date or room type?");
+        });
+      }
+
+      async function createBooking(data) {
+        const apiCreateBooking = "/booking/insert-booking";
+        var options = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        };
+
+        await fetch(apiCreateBooking, options).then(async function (response) {
+          if (await response.ok) {
+            await response.json();
+            alert("Create booking successfully");
+          } else alert("Unfortunately, all rooms are fully booked for your selected dates. Would you like to choose a different date or room type?");
+        });
+      };
+
+      async function handleCreateBooking() {
+        let btnCreate = document.getElementById("btnCreate");
+
+        btnCreate.onclick = async function () {
+          var checkedValue = [];
+          var inputElements =
+            document.getElementsByClassName("form-check-input");
+          for (var i = 0; inputElements[i]; ++i) {
+            if (inputElements[i].checked) {
+              checkedValue.push(inputElements[i].value);
+            }
+          }
+          var checkOut = document.querySelector('input[name="checkOut"]').value;
+          var checkIn = document.querySelector('input[name="checkIn"]').value;
+          var email = document.querySelector('input[name="email"]').value;
+          var name = document.querySelector('input[name="name"]').value;
+
+          const response = await fetch("/authenticate/get-user-login");
+          if (response.ok) {
+            var username = await response.json();
+            var res = await fetch("/authenticate/get-user?username="+username);
+            var user = await res.json();
+            var res1 = await fetch("/room/get-room?_id="+getIdRoomFromURL());
+            var room = await res1.json();
+            var formData = {
+              room: room,
+              user: user,
+              checkOutDate: new Date(checkOut).toLocaleDateString("en-CA"),
+              checkInDate: new Date(checkIn).toLocaleDateString("en-CA"),
+              number: checkedValue,
+              name: name,
+              email: email,
+            };
+
+            await createBooking(formData);
+          } else {
+            window.location.replace("/login");
+          };
+        };
+      };
+    </script>
+  </body>
+</html>

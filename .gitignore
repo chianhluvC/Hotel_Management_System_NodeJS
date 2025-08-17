@@ -1,0 +1,48 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+pnpm-lock.yaml
+
+# Logs
+logs
+*.log
+logs/*.log
+pids
+*.pid
+*.seed
+
+# Runtime data
+tmp/
+temp/
+*.tmp
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database dumps
+*.sql
+*.sqlite
+*.db
+dump.rdb
+
+# Build and coverage
+dist/
+build/
+coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# OS-specific
+.DS_Store
+Thumbs.db

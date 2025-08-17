@@ -1,0 +1,118 @@
+
+<html>
+<body>
+    <%- include('../../partical/admin/header'); %>
+    <!-- Table Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">MANAGE ROOMS</h6>
+                    <a href="/admin/add-room">ADD ROOM</a>
+                    <div class="table-responsive">
+                        <table id="roomTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">name</th>
+                                    <th scope="col">price</th>
+                                    <th scope="col">desc</th>
+                                    <!-- <th scope="col">img</th> -->
+                                    <th scope="col">room numbers : unavailable date</th>
+                                    <th scope="col">manage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mainRoom">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Table End -->
+    
+    <%- include('../../partical/admin/footer'); %>
+    
+    
+<script>
+
+    loadData();
+    async function loadData(){
+        await loadRoom();
+        let table = new DataTable('#roomTable');
+    };
+
+    async function loadRoom() {
+      
+        var mainRoom = document.getElementById("mainRoom");
+        const response = await  fetch("/room/room-list");
+        var temp="";
+        var temp1, temp2, temp3;
+        var data = await response.json();
+        console.log(data);
+        mainRoom.innerHTML = ``;
+
+              for(var i = 0; i< data.length; i++){
+                    temp1=temp2=temp3="";
+                    temp1 = `<tr>
+                            <th scope="row">${i+1}</th>
+                            <td>${data[i].name}</td>
+                            <td>${data[i].price}</td>
+                            <td>${data[i].desc}</td><td>`
+                    for(var j = 0; j< data[i].roomNumbers.length; j++){
+                        var arr = Object.values(data[i].roomNumbers[j].unavailbleDates);
+                        tempDate = arr.map(p=>new Date(p).toLocaleDateString('en-GB'));
+                        temp2 += `${data[i].roomNumbers[j].number}: ${tempDate}<br>`
+                    };
+                    
+                    temp3 = `</td><td><a href="#" onclick="showMessageBox('${data[i]._id}')">delete</a> || <a href="/admin/edit-room/${data[i]._id}">edit</a></td>
+                            </tr>`
+
+                    temp += temp1 + temp2 + temp3;           
+                            
+                };
+
+        mainRoom.innerHTML = temp;
+    };
+
+
+
+    async function handleDeleteRoom(id) {
+            try {
+            const response = await fetch('/room/delete-room?_id=' + id, {
+                method: "delete"
+            });
+
+            if (!response.ok) {
+                const message = 'Error with Status Code: ' + response.status;
+                throw new Error(message);
+            };
+
+            const data = await response.json();
+            console.log(data);
+            loadData();
+            } catch (error) {
+            console.log('Error: ' + err);
+            };
+    };
+
+    async function showMessageBox(id) {
+            var txt;
+            if (confirm("You want delete this Room?")) {
+                txt = "You pressed Yes!";
+                await handleDeleteRoom(id);
+                alert("Delete successfully!");
+            } else {
+                txt = "You pressed Cancel!";
+            }            
+    };
+
+</script>
+
+
+</body>
+</html>
+
+

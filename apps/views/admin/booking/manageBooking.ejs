@@ -1,0 +1,79 @@
+
+<html>
+<body>
+    <%- include('../../partical/admin/header'); %>
+    <!-- Table Start -->
+    <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="bg-light rounded h-100 p-4">
+                    <h6 class="mb-4">MANAGE BOOKING</h6>
+                    <div class="table-responsive">
+                        <table id="bookingTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">name</th>
+                                    <th scope="col">email</th>
+                                    <th scope="col">checkin</th>
+                                    <th scope="col">checkout</th>
+                                    <th scope="col">numberRoom</th>
+                                    <th scope="col">total</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="mainBooking">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Table End -->
+    
+    <%- include('../../partical/admin/footer'); %>
+    
+    
+<script>
+
+    loadData();
+    async function loadData(){
+        await loadBooking();
+        let table = new DataTable('#bookingTable');
+    };
+
+    async function loadBooking() {
+      
+        var mainBooking = document.getElementById("mainBooking");
+        const response = await  fetch("/booking/booking-list");
+        var temp="";
+        var data = await response.json();
+        mainBooking.innerHTML = ``;
+
+              for(var i = 0; i< data.length; i++){
+
+                    temp += `<tr>
+                            <th scope="row">${i+1}</th>
+                            <td>${data[i].name}</td>
+                            <td>${data[i].email}</td>
+                            <td>${new Date(data[i].checkInDate).toLocaleDateString('en-GB')}</td>
+                            <td>${new Date(data[i].checkOutDate).toLocaleDateString('en-GB')}</td>
+                            <td>${data[i].roomNumberBooked}</td>
+                            <td>${data[i].total}</td></tr>`
+                            
+                };
+
+        mainBooking.innerHTML = temp;
+    };
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
